@@ -46,6 +46,7 @@ export const verification = pgTable("verification", {
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
    createdAt: timestamp("createdAt").$defaultFn(()=> new Date()).notNull(),
+   expiresAt: timestamp("expiresAt").notNull(),
   updatedAt: timestamp("updatedAt").$defaultFn(()=> new Date()).notNull(),
 
   

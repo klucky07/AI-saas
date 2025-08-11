@@ -3,6 +3,7 @@ import {  OctagonAlertIcon } from "lucide-react"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { z } from "zod"
+import { FaGithub, FaGoogle } from "react-icons/fa"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Alert, AlertTitle } from "@/components/ui/alert"
 import { Input } from "@/components/ui/input"
@@ -47,11 +48,31 @@ export const SignUpView = () => {
         authClient.signUp.email(
             { name:data.name,
                 email:data.email,
-                password:data.password
+                password:data.password,
+                callbackURL:'/'
             },{
             onSuccess:()=>{
                 setPending(false)
                 router.push("/");
+            },
+            onError:({error})=>{
+                setPending(false)
+                setError(error.message)
+            }}
+        )
+
+    }
+     const onSocial =(provider:"google" | "github") =>{
+        setError(null);
+        setPending(true)
+
+        authClient.signIn.social(
+            { provider:provider,
+                callbackURL:'/'
+            },{
+            onSuccess:()=>{
+                setPending(false)
+               
             },
             onError:({error})=>{
                 setPending(false)
@@ -160,11 +181,13 @@ export const SignUpView = () => {
                                     Or continue with
                                     </span></div>
                                     <div className="grid grid-cols-2 gap-2">
-                                        <Button className="w-full" variant="outline" type="button"> 
-                                        Google
+                                        <Button  onClick={()=>onSocial("google")
+                                         } className="w-full" variant="outline" type="button"> 
+                                        <FaGoogle/>
                                         </Button>
-                                         <Button className="w-full" variant="outline" type="button"> 
-                                        Github 
+                                         <Button onClick={()=>onSocial("github")
+                                         } className="w-full" variant="outline" type="button"> 
+                                     <FaGithub/> 
                                         </Button>
                                         
                                         
