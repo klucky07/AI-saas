@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -51,3 +52,19 @@ export const verification = pgTable("verification", {
 
   
 });
+
+
+export const agents =pgTable("agents",{
+  id:text("id")
+    .primaryKey()
+    .$defaultFn(()=> nanoid()),
+    name:text("name").notNull(),
+    userId:text("user_id")
+      .notNull()
+      .references(()=>user.id,{onDelete:"cascade"}),
+instructions:text("instruction").notNull(),
+ createdAt: timestamp("createdAt").notNull().defaultNow(),
+
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+  
+})
