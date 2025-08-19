@@ -1,26 +1,26 @@
 import { nanoid } from "nanoid";
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
-  emailVerified: boolean("emailVerified").$defaultFn(()=> false).notNull(),
+  emailVerified: boolean("emailVerified").$defaultFn(() => false).notNull(),
   image: text("image"),
-  createdAt: timestamp("createdAt").$defaultFn(()=> new Date()).notNull(),
-  updatedAt: timestamp("updatedAt").$defaultFn(()=> new Date()).notNull(),
+  createdAt: timestamp("createdAt").$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updatedAt").$defaultFn(() => new Date()).notNull(),
 });
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
-  token:text('token').notNull().unique(),
-expiresAt: timestamp("expiresAt").notNull(),
-  createdAt:timestamp('created_at').notNull(),
-  updatedAt:timestamp('updated_at').notNull(),
+  token: text('token').notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  createdAt: timestamp('created_at').notNull(),
+  updatedAt: timestamp('updated_at').notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
   userId: text("userId")
     .notNull()
-    .references(() => user.id,{onDelete:'cascade'})
+    .references(() => user.id, { onDelete: 'cascade' })
 });
 
 export const account = pgTable("account", {
@@ -29,42 +29,73 @@ export const account = pgTable("account", {
   providerId: text("provider_id").notNull(),
   userId: text("userId")
     .notNull()
-    .references(() => user.id,{onDelete:'cascade'}),
+    .references(() => user.id, { onDelete: 'cascade' }),
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
   idToken: text("id_token"),
-accessTokenExpiresAt:timestamp('access_token_expires_at'),
-refreshTokenExpiresAt:timestamp('refresh_token_expires_at'),
-scope:text('scope'),
+  accessTokenExpiresAt: timestamp('access_token_expires_at'),
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+  scope: text('scope'),
 
   password: text("password"),
-    createdAt:timestamp('created_at').notNull(),
-  updatedAt:timestamp('updated_at').notNull(),
+  createdAt: timestamp('created_at').notNull(),
+  updatedAt: timestamp('updated_at').notNull(),
 });
 
 export const verification = pgTable("verification", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
-   createdAt: timestamp("createdAt").$defaultFn(()=> new Date()).notNull(),
-   expiresAt: timestamp("expiresAt").notNull(),
-  updatedAt: timestamp("updatedAt").$defaultFn(()=> new Date()).notNull(),
+  createdAt: timestamp("createdAt").$defaultFn(() => new Date()).notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  updatedAt: timestamp("updatedAt").$defaultFn(() => new Date()).notNull(),
 
-  
+
 });
 
 
-export const agents =pgTable("agents",{
-  id:text("id")
+export const agents = pgTable("agents", {
+  id: text("id")
     .primaryKey()
-    .$defaultFn(()=> nanoid()),
-    name:text("name").notNull(),
-    userId:text("user_id")
-      .notNull()
-      .references(()=>user.id,{onDelete:"cascade"}),
-instructions:text("instruction").notNull(),
- createdAt: timestamp("createdAt").notNull().defaultNow(),
+    .$defaultFn(() => nanoid()),
+  name: text("name").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  instructions: text("instruction").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
 
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-  
+
+})
+
+export const meetingStatus = pgEnum("meeting_status", [
+  "upcoming",
+  "active",
+  "completed",
+  "processing",
+  "cancelled"
+])
+export const meetings = pgTable("meetings", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
+  name: text("name").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  agentId: text("agent_id")
+    .notNull()
+    .references(() => agents.id, { onDelete: "cascade" }),
+  status: meetingStatus("status").notNull().default("upcoming"),
+ 
+  startedAt: timestamp("startedAt"),
+  endedAt: timestamp("endedAt"),
+  transcriptUrl:text("transcript_url"),
+  recordingUrl:text("recording_url"),
+  summary:text("summary"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+
 })
