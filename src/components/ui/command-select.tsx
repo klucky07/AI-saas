@@ -13,7 +13,7 @@ interface Props{
         children:ReactNode;
     }>
     onSelect:(value:string)=>void;
-    onSearch:(value:string)=>void;
+    onSearch?:(value:string)=>void;
     value:string;
     placeholder?:string;
     isSearchable?:boolean;
@@ -21,15 +21,22 @@ interface Props{
 }
 
 export const CommandSelect =({
-options,onSearch,onSelect,value,placeholder,isSearchable,className
+options,
+onSearch
+,onSelect,
+value,placeholder,isSearchable,className
 
 }:Props)=>{
     const [open,setOpen]=useState(false);
     const selectedOption=options.find((option)=>option.value === value);
+const handleOpenChange =(open:boolean)=>{
+    onSearch?.("")
+    setOpen(open);
 
+}
     return(
         <>
-        <Button
+        <Button  
         onClick={()=>setOpen(true)}
          type="button"
         variant="outline"
@@ -48,7 +55,7 @@ options,onSearch,onSelect,value,placeholder,isSearchable,className
         <CommandResponsiveDialog
         shouldFilter={!onSearch}
         open={open}
-        onOpenChange={setOpen}>
+        onOpenChange={handleOpenChange}>
                 <CommandInput placeholder="search... " onValueChange={onSearch} />
                 <CommandList>
                     <CommandEmpty>
