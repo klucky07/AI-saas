@@ -30,6 +30,7 @@ const {data} =useQuery(trpc.meetings.getMany.queryOptions({
            />
            {data?.items.length === 0  && (
                            <EmptyState
+                           image=""
                               title="create your first meeting"
                            description="Create an agent to join your meetings.Each agent will follow your instructions and can interact with participants during the call "/>
                         )}

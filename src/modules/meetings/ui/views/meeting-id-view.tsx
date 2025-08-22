@@ -6,13 +6,18 @@ import { queryOptions, useMutation, useQueryClient, useSuspenseQuery } from "@ta
 import { MeetingIdViewHeader } from "./meeting-id-view-header";
 import { useRouter } from "next/navigation";
 import { UseConfirm } from "../../hooks/use-confirm";
+import { UpcomingState } from "../components/upcomingState";
+import { ActiveState } from "../components/activeState";
+import { CancelledState } from "../components/cancelledState";
+import { ProcessingState } from "../components/processingState";
 
 
 interface Props {
     meetingId:string
 }
 
-export const MeetingIdView =({meetingId}:Props)=>{
+export const 
+MeetingIdView =({meetingId}:Props)=>{
     const trpc =useTRPC();
     const router =useRouter();
     const queryClient=useQueryClient();
@@ -38,6 +43,15 @@ const handleRemoveMeeting =async ()=>{
     if(!ok) return;
     await removeMeeting.mutateAsync({id:meetingId})
 }
+
+const isActive =data.status === 'active';
+const isUpcoming =data.status === 'upcoming';
+const isCancelled =data.status === 'cancelled';
+const isCompleted =data.status === 'completed';
+const isProcessing =data.status === 'processing';
+
+
+
     return (
         <>
         <RemoveConfirmation/>
@@ -49,6 +63,16 @@ onEdit={()=>{}}
 onRemove={()=>{handleRemoveMeeting}}
 
 />
+{isCancelled && <CancelledState/>}
+{isActive && <ActiveState meetingId={meetingId}/>}
+{isUpcoming&& <UpcomingState  
+meetingId={meetingId}
+oncancelMeeting={()=>{}}
+isCancelling={false}
+/>}
+{isCompleted  && <div>Completed</div>}
+{isProcessing && <ProcessingState/>}
+
         </div>
         </>
     )
